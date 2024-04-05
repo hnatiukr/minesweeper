@@ -27,7 +27,7 @@ Minesweeper is a computer game where players clear a grid of hidden mines withou
 
 - [ ] refactor this mess of code
 - [ ] add some tests
-- [ ] stylize the map and cells
+- [x] ~~stylize the map and cells~~
 - [x] ~~show timer~~
 - [ ] in case of winning, save the score to table based on spent time
 - [ ] add difficulty levels

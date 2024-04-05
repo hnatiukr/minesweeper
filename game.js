@@ -2,11 +2,12 @@ const ROWS = 9;
 const COLS = 9;
 const SIZE = 36;
 
+const audio = new Audio();
+
 const body = document.getElementById("body");
 const grid = document.getElementById("grid");
 const timer = document.getElementById("timer");
 const restart = document.getElementById("restart");
-const highlight = document.getElementById("highlight");
 
 let cells;
 let failedBombKey;
@@ -18,8 +19,7 @@ let firstClick;
 let seconds = 0;
 let highlighted = false;
 let intervalId;
-
-highlight.onclick = toggleBombHighlighting;
+let partyIntervalId;
 
 restart.style.width = `${SIZE}px`;
 restart.style.height = `${SIZE}px`;
@@ -57,6 +57,10 @@ function createButtons() {
       };
 
       cell.onclick = () => {
+        if (!partyIntervalId) {
+          party();
+        }
+
         if (failedBombKey !== null) {
           return;
         }
@@ -111,7 +115,6 @@ function updateButtons() {
       let key = toKey(i, j);
       let cell = cells.get(key);
 
-      cell.style.backgroundColor = "";
       cell.style.color = "black";
       cell.textContent = "";
       cell.disabled = false;
@@ -123,8 +126,6 @@ function updateButtons() {
         cell.textContent = "💣";
 
         if (key === failedBombKey) {
-          cell.style.backgroundColor = "red";
-
           clearInterval(intervalId);
         }
       } else if (revealedKeys.has(key)) {
@@ -134,13 +135,10 @@ function updateButtons() {
           // empty
         } else if (value === 1) {
           cell.textContent = "1";
-          cell.style.color = "blue";
         } else if (value === 2) {
           cell.textContent = "2";
-          cell.style.color = "green";
         } else if (value >= 3) {
           cell.textContent = value;
-          cell.style.color = "red";
         } else {
           throw Error("should never happen");
         }
@@ -153,11 +151,11 @@ function updateButtons() {
   if (failedBombKey !== null) {
     grid.style.pointerEvents = "none";
     restart.innerText = "😵";
-    body.style.backgroundColor = "#FFEBE6";
+    clearInterval(partyIntervalId);
+    document.querySelector('#try-again').style.display = 'block';
   } else {
     grid.style.pointerEvents = "";
     restart.innerText = "🙂";
-    body.style.backgroundColor = "#DFE1E6";
   }
 
   checkWinnings();
@@ -268,35 +266,6 @@ function generateMap(seedBombs) {
   return map;
 }
 
-function toggleBombHighlighting() {
-  if (highlighted) {
-    for (let i = 0; i < ROWS; i += 1) {
-      for (let j = 0; j < COLS; j += 1) {
-        const key = toKey(i, j);
-        const cell = cells.get(key);
-
-        cell.style.boxShadow = "none";
-      }
-    }
-  } else {
-    for (let i = 0; i < ROWS; i += 1) {
-      for (let j = 0; j < COLS; j += 1) {
-        const key = toKey(i, j);
-        const value = map.get(key);
-
-        if (value === "bomb") {
-          const cell = cells.get(key);
-
-          cell.style.boxShadow =
-            "0 0 3px rgb(255, 0, 0), 0 0 3px rgb(255, 0, 0) inset";
-        }
-      }
-    }
-  }
-
-  highlighted = !highlighted;
-}
-
 function checkWinnings() {
   const flaggedCells = [...flaggedKeys.keys()].sort().join();
   const bombedCells = [...map.entries()]
@@ -311,7 +280,6 @@ function checkWinnings() {
     failedBombKey === null
   ) {
     restart.innerText = "😎";
-    body.style.backgroundColor = "#E3FCEF";
 
     clearInterval(intervalId);
   }
@@ -320,6 +288,47 @@ function checkWinnings() {
 function updateTimer() {
   seconds += 1;
   timer.textContent = seconds;
+}
+
+function party() {
+  window.onload = setInterval(AudioLoop, 1000 / 10); //10fps
+
+  audio.src = 'soundtrack.mp3';
+
+  function AudioLoop() {
+      audio.play().catch(() => {});
+
+      if (audio.paused == true) {
+          audio.play().catch(() => {});
+      }
+  }
+
+  const fubars = document.querySelectorAll('.fubar');
+  fubars.forEach((fubar) => {
+    fubar.style.opacity = '1';
+  });
+
+  partyIntervalId = setInterval(() => {
+    body.style.backgroundColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+
+    fubars.forEach((fubar) => {
+      fubar.style.color = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+    });
+
+    for (let i = 0; i < ROWS; i += 1) {
+      for (let j = 0; j < COLS; j += 1) {
+        let key = toKey(i, j);
+        let cell = cells.get(key);
+
+        if (cell.disabled) {
+          cell.style.backgroundColor = '#fff';
+        } else {
+          cell.style.color = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+          cell.style.backgroundColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+        }
+      }
+    }
+  }, 150);
 }
 
 startGame();
