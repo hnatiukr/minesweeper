@@ -1,0 +1,66 @@
+button {
+    cursor: pointer;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding-top: 150px;
+
+    background-color: #dfe1e6;
+}
+
+#interface {
+    width: max-content;
+
+    background: lightgrey;
+
+    border-radius: 4px;
+    border: 1px solid grey;
+
+    overflow: hidden;
+}
+
+#dashboard {
+    display: flex;
+    justify-content: space-around;
+
+    padding: 10px 20px;
+
+    border-bottom: 1px solid grey;
+}
+
+#dashboard > button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 24px;
+    height: 24px;
+}
+
+#grid > button {
+    font-weight: bold;
+}
+
+#grid > button[disabled] {
+    cursor: not-allowed;
+}
+
+#timer,
+#score {
+    width: 80px;
+
+    color: #ffffff;
+
+    font-family: monospace;
+    font-size: 20px;
+    line-height: 40px;
+    text-align: center;
+
+    background-color: #de350b;
+
+    border-radius: 4px;
+}
